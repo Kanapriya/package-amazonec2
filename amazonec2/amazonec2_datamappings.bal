@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License
 
-function converTotInstanceList(xml response) returns InstanceList {
+function converToInstanceList(xml response) returns InstanceList {
     InstanceList instancesList = {};
     instancesList.requestId = response["requestId"].getTextValue();
     xml instances = response["instancesSet"];
@@ -29,4 +29,21 @@ function converTotInstanceList(xml response) returns InstanceList {
     }
     instancesList.instanceSet = list;
     return instancesList;
+}
+
+function converToReservationList(xml response) returns ReservationList {
+    ReservationList reservationList = {};
+    reservationList.requestId = response["requestId"].getTextValue();
+    xml reservations = response["reservationSet"];
+    ReservationSet[] list;
+    int j = 0;
+    foreach i, x in reservations {
+        xml content = x.elements();
+        ReservationSet reservationSet = {};
+        reservationSet.instanceId = content["item"]["reservationId"].getTextValue();
+        list[j] = reservationSet;
+        j = j + 1;
+    }
+    reservationList.reservationSet = list;
+    return reservationList;
 }

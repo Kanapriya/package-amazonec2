@@ -44,7 +44,8 @@ function generateSignature(http:Request request, string accessKeyId, string secr
     shortDate = time.format(SHORT_DATE_FORMAT);
     request.setHeader(CONTENT_TYPE, APPLICATION_URL_ENCODED);
     request.setHeader(X_AMZ_DATE, amzDate);
-    request.setHeader(HOST, "ec2.us-west-2.amazonaws.com");
+    string host = SERVICE_NAME + "." + region + "." + "amazonaws.com";
+    request.setHeader(HOST,host);
 
     canonicalRequest = httpVerb;
     canonicalRequest = canonicalRequest + "\n";

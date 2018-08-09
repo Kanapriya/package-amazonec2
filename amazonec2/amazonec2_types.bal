@@ -59,22 +59,23 @@ public type AmazonEC2Connector object {
     public http:Client clientEndpoint = new;
 
     documentation {
-        Starts an Amazon EBS-backed instance that you've previously stopped.
-        P{{instanceArray}} - One or more instance IDs
-        R{{}} - If success, returns InstanceList of started instances, else returns AmazonEC2Error object.}
-    public function startInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error;
+        Launches the specified number of instances using an AMI for which you have permissions.
+        P{{imgId}} -  The ID of the AMI which is required to launch an instance
+        P{{maxCount}} - The maximum number of instances to launch
+        P{{minCount}} - The minimum number of instances to launch
+        R{{}} - If success, returns InstanceList of launched instances, else returns AmazonEC2Error object.}
+    public function runInstances(string imgId, int maxCount, int minCount) returns InstanceList|AmazonEC2Error;
 
     documentation {
         Enables detailed monitoring for a running instance.
-        P{{instanceArray}} - One or more instance IDs
-        R{{}} - If success, returns InstanceList with monitoring information, else returns AmazonEC2Error object.}
-    public function monitorInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error;
+        R{{}} - If success, returns ReservationList with zero or more reservations., else returns AmazonEC2Error object.}
+    public function describeInstances() returns ReservationList|AmazonEC2Error;
 
     documentation {
-        Stops an Amazon EBS-backed instance.
+        Terminate an Amazon EBS-backed instance.
         P{{instanceArray}} - One or more instance IDs
-        R{{}} - If success, returns InstanceList with stopped instances, else returns AmazonEC2Error object.}
-    public function stopInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error;
+        R{{}} - If success, returns InstanceList with terminated instances, else returns AmazonEC2Error object.}
+    public function terminateInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error;
 };
 
 documentation {
@@ -109,6 +110,24 @@ documentation {
 }
 public type InstanceSet record {
     string instanceId;
+};
+
+documentation {
+    Define the Reservation object details
+    F{{reservationSet}} - Reservation set with instance details.
+    F{{requestId}} - request id
+}
+public type ReservationList record {
+    ReservationSet[] reservationSet;
+    string requestId;
+};
+
+documentation {
+    Define the Reservation set with reservation id's
+    F{{reservationId}} - Reservation id
+}
+public type ReservationSet record {
+    string reservationId;
 };
 
 documentation {

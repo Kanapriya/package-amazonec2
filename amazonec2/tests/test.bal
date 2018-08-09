@@ -26,6 +26,9 @@ string testSecretAccessKey = config:getAsString("SECRET_ACCESS_KEY");
 string testRegion = config:getAsString("REGION");
 string testInstance_1 = config:getAsString("INSTANCE_ID_1");
 string testInstance_2 = config:getAsString("INSTANCE_ID_1");
+string imageId = config:getAsString("IMAGE_ID");
+int max = config:getAsInt("MAX_COUNT");
+int min = config:getAsInt("MIN_COUNT");
 
 endpoint Client amazonEC2Client {
     accessKeyId: testAccessKeyId,
@@ -34,15 +37,14 @@ endpoint Client amazonEC2Client {
 };
 
 @test:Config
-function testStartInstances() {
-    log:printInfo("amazonEC2Client -> startInstances()");
-    string[] instanceArray = [testInstance_1,testInstance_2 ];
-    var rs = amazonEC2Client->startInstances(instanceArray);
+function testRunInstances() {
+    log:printInfo("amazonEC2Client -> runInstances()");
+    var rs = amazonEC2Client->runInstances(imageId, max, min);
     match rs {
         InstanceList instance => {
-            io:println(" Successfully start the instance : ");
+            io:println(" Successfully run the instance : ");
             string instanceId = (instance.instanceSet[0].instanceId);
-            test:assertNotEquals(instanceId, null, msg = "Failed to startInstances");
+            test:assertNotEquals(instanceId, null, msg = "Failed to runInstances");
         }
         AmazonEC2Error err => {
             io:println(err);
@@ -52,15 +54,14 @@ function testStartInstances() {
 }
 
 @test:Config
-function testMonitorInstances() {
-    log:printInfo("amazonEC2Client -> monitorInstances()");
-    string[] instanceArray = [testInstance_2];
-    var rs = amazonEC2Client->monitorInstances(instanceArray);
+function testDescribeInstances() {
+    log:printInfo("amazonEC2Client -> describeInstances()");
+    var rs = amazonEC2Client->describeInstances();
     match rs {
-        InstanceList instance => {
-            io:println(" Successfully monitor the instance : ");
-            string instanceId = (instance.instanceSet[0].instanceId);
-            test:assertNotEquals(instanceId, null, msg = "Failed to monitorInstances");
+        ReservationList reservations => {
+            io:println(" Successfully describe the instance : ");
+            string reservationId = (reservations.reservationSet[0].reservationId);
+            test:assertNotEquals(reservationId, null, msg = "Failed to describeInstances");
         }
         AmazonEC2Error err => {
             io:println(err);
@@ -70,15 +71,15 @@ function testMonitorInstances() {
 }
 
 @test:Config
-function testStopInstances() {
-    log:printInfo("amazonEC2Client -> stopInstances()");
-    string[] instanceArray = [testInstance_2];
-    var rs = amazonEC2Client->stopInstances(instanceArray);
+function testTerminateInstances() {
+    log:printInfo("amazonEC2Client -> terminateInstances()");
+    string[] instanceArray = [testInstance_2,testInstance_2];
+    var rs = amazonEC2Client->terminateInstances(instanceArray);
     match rs {
         InstanceList instance => {
-            io:println(" Successfully stop the instance : ");
+            io:println(" Successfully terminate the instance : ");
             string instanceId = (instance.instanceSet[0].instanceId);
-            test:assertNotEquals(instanceId, null, msg = "Failed to stopInstances");
+            test:assertNotEquals(instanceId, null, msg = "Failed to terminateInstances");
         }
         AmazonEC2Error err => {
             io:println(err);

@@ -23,7 +23,6 @@ function Client::init(AmazonEC2Configuration config) {
     self.amazonEC2Connector.accessKeyId = config.accessKeyId;
     self.amazonEC2Connector.secretAccessKey = config.secretAccessKey;
     string ec2Endpoint = "https://ec2." + self.amazonEC2Connector.region + ".amazonaws.com";
-    config.uri = ec2Endpoint ;
     config.clientConfig.url = ec2Endpoint;
     self.amazonEC2Connector.clientEndpoint.init(config.clientConfig);
 }

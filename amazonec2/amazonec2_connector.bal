@@ -19,7 +19,7 @@ import ballerina/http;
 import ballerina/time;
 import ballerina/crypto;
 
-function AmazonEC2Connector::startInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error {
+function AmazonEC2Connector::runInstances(string imgId, int maxCount, int minCount) returns InstanceList|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -28,14 +28,11 @@ function AmazonEC2Connector::startInstances(string[] instanceArray) returns Inst
     string host = SERVICE_NAME + "." + self.region + "." + "amazonaws.com";
     string amazonEndpoint = "https://" + host;
     http:Request request = new;
-    string canonicalQueryString = "Action=StartInstances&";
-    int i = 1;
-    foreach instances in instanceArray {
-        canonicalQueryString = canonicalQueryString + "InstanceId." + i + "=" + instances + "&";
-        i = i + 1;
-    }
+    string canonicalQueryString = "Action=RunInstances&" + "ImageId" + "=" + imgId + "&" +
+        "MaxCount" + "=" + maxCount + "&" + "MinCount" + "=" + minCount + "&";
     canonicalQueryString = canonicalQueryString + "Version" + "=" + API_VERSION;
     string constructCanonicalString = "/?" + canonicalQueryString;
+    request.setHeader(HOST, host);
     generateSignature(request, self.accessKeyId, self.secretAccessKey, self.region, GET, requestURI, "",
         canonicalQueryString);
     var httpResponse = clientEndpoint->get(constructCanonicalString, message = request);
@@ -54,7 +51,7 @@ function AmazonEC2Connector::startInstances(string[] instanceArray) returns Inst
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converTotInstanceList(xmlResponse);
+                        return converToInstanceList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;
@@ -66,7 +63,7 @@ function AmazonEC2Connector::startInstances(string[] instanceArray) returns Inst
     }
 }
 
-function AmazonEC2Connector::monitorInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error {
+function AmazonEC2Connector::describeInstances() returns ReservationList|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -75,14 +72,10 @@ function AmazonEC2Connector::monitorInstances(string[] instanceArray) returns In
     string host = SERVICE_NAME + "." + self.region + "." + "amazonaws.com";
     string amazonEndpoint = "https://" + host;
     http:Request request = new;
-    string canonicalQueryString = "Action=MonitorInstances&";
-    int i = 1;
-    foreach instances in instanceArray {
-        canonicalQueryString = canonicalQueryString + "InstanceId." + i + "=" + instances + "&";
-        i = i + 1;
-    }
+    string canonicalQueryString = "Action=DescribeInstances&";
     canonicalQueryString = canonicalQueryString + "Version" + "=" + API_VERSION;
     string constructCanonicalString = "/?" + canonicalQueryString;
+    request.setHeader(HOST, host);
     generateSignature(request, self.accessKeyId, self.secretAccessKey, self.region, GET, requestURI, "",
         canonicalQueryString);
     var httpResponse = clientEndpoint->get(constructCanonicalString, message = request);
@@ -101,7 +94,7 @@ function AmazonEC2Connector::monitorInstances(string[] instanceArray) returns In
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converTotInstanceList(xmlResponse);
+                        return converToReservationList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;
@@ -113,7 +106,7 @@ function AmazonEC2Connector::monitorInstances(string[] instanceArray) returns In
     }
 }
 
-function AmazonEC2Connector::stopInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error {
+function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -122,7 +115,7 @@ function AmazonEC2Connector::stopInstances(string[] instanceArray) returns Insta
     string host = SERVICE_NAME + "." + self.region + "." + "amazonaws.com";
     string amazonEndpoint = "https://" + host;
     http:Request request = new;
-    string canonicalQueryString = "Action=StopInstances&";
+    string canonicalQueryString = "Action=TerminateInstances&";
     int i = 1;
     foreach instances in instanceArray {
         canonicalQueryString = canonicalQueryString + "InstanceId." + i + "=" + instances + "&";
@@ -148,7 +141,7 @@ function AmazonEC2Connector::stopInstances(string[] instanceArray) returns Insta
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converTotInstanceList(xmlResponse);
+                        return converToInstanceList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;
