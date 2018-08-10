@@ -58,7 +58,7 @@ function converToTerminationInstanceList(xml response) returns TerminationInstan
         StateSet [] setList;
         xml content = x.elements();
         TerminateInstanceSet instanceSet = {};
-        instanceSet.instId = content["instanceId"].getTextValue();
+        instanceSet.instanceId = content["instanceId"].getTextValue();
         xml currentStates = content["currentState"];
         foreach a, y in currentStates {
             xml stateContent = y.elements();
