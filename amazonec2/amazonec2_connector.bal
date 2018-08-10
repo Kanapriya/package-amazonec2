@@ -19,7 +19,7 @@ import ballerina/http;
 import ballerina/time;
 import ballerina/crypto;
 
-function AmazonEC2Connector::runInstances(string imgId, int maxCount, int minCount) returns InstanceList|AmazonEC2Error {
+function AmazonEC2Connector::runInstances(string imgId, int maxCount, int minCount) returns EC2Instance[]|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -51,7 +51,7 @@ function AmazonEC2Connector::runInstances(string imgId, int maxCount, int minCou
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converToInstanceList(xmlResponse);
+                        return getSpawnedInstancesList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;
@@ -63,7 +63,7 @@ function AmazonEC2Connector::runInstances(string imgId, int maxCount, int minCou
     }
 }
 
-function AmazonEC2Connector::describeInstances() returns DescribeInstanceList |AmazonEC2Error {
+function AmazonEC2Connector::describeInstances() returns EC2Instance[]|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -94,7 +94,7 @@ function AmazonEC2Connector::describeInstances() returns DescribeInstanceList |A
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converToReservationList(xmlResponse);
+                        return getInstanceList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;
@@ -106,7 +106,7 @@ function AmazonEC2Connector::describeInstances() returns DescribeInstanceList |A
     }
 }
 
-function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns TerminationInstanceList|AmazonEC2Error {
+function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns EC2Instance[]|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -141,7 +141,7 @@ function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns 
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converToTerminationInstanceList(xmlResponse);
+                        return getTerminatedInstancesList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;

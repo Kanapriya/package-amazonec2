@@ -19,6 +19,15 @@
 import ballerina/io;
 import ballerina/time;
 
+public type InstanceState "pending"|"running"|"shutting-down"|"terminated"|"stopping"|"stopped";
+
+@final public InstanceState ISTATE_PENDING = "pending";
+@final public InstanceState ISTATE_RUNNING = "running";
+@final public InstanceState ISTATE_SHUTTING_DOWN = "shutting-down";
+@final public InstanceState ISTATE_TERMINATED = "terminated";
+@final public InstanceState ISTATE_STOPPING = "stopping";
+@final public InstanceState ISTATE_STOPPED = "stopped";
+
 documentation {
     Define the AmazonEC2 Connector.
     E{{}}
@@ -65,18 +74,18 @@ public type AmazonEC2Connector object {
         P{{maxCount}} - The maximum number of instances to launch
         P{{minCount}} - The minimum number of instances to launch
         R{{}} - If success, returns InstanceList of launched instances, else returns AmazonEC2Error object.}
-    public function runInstances(string imgId, int maxCount, int minCount) returns InstanceList|AmazonEC2Error;
+    public function runInstances(string imgId, int maxCount, int minCount) returns EC2Instance[]|AmazonEC2Error;
 
     documentation {
         Describes one or more of your instances.
-        R{{}} - If success, returns DescribeInstanceList with zero or more reservations., else returns AmazonEC2Error object.}
-    public function describeInstances() returns DescribeInstanceList |AmazonEC2Error;
+        R{{}} If successful, returns EC2Instance[] with zero or more instances, else returns an AmazonEC2Error.}
+    public function describeInstances() returns EC2Instance[]|AmazonEC2Error;
 
     documentation {
         Shuts down one or more instances.
         P{{instanceArray}} - One or more instance IDs
         R{{}} - If success, returns TerminationInstanceList with terminated instances, else returns AmazonEC2Error object.}
-    public function terminateInstances(string[] instanceArray) returns TerminationInstanceList|AmazonEC2Error;
+    public function terminateInstances(string[] instanceArray) returns EC2Instance[]|AmazonEC2Error;
 };
 
 documentation {
@@ -93,6 +102,27 @@ public type AmazonEC2Configuration record {
     string secretAccessKey;
     string region;
     http:ClientEndpointConfig clientConfig = {};
+};
+
+documentation {
+    Representation of an EC2 instance.
+
+    F{{id}} The ID of the EC2 instance
+    F{{imageId}} The ID of the image used to create the instance
+    F{{state}} The current state of the instance
+    F{{iType}} The type of the instance (e.g., t2.micro)
+    F{{zone}} The zone in which the instance resides
+    F{{privateIpAddress}} The private IP address of the instance
+    F{{ipAddress}} The public IP address of the instance (if assigned one)
+}
+public type EC2Instance record {
+    string id,
+    string imageId,
+    InstanceState? state,
+    string iType, // instance type - e.g., t2.micro
+    string zone,
+    string privateIpAddress,
+    string ipAddress,
 };
 
 documentation {
