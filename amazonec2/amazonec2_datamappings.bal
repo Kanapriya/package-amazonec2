@@ -138,3 +138,48 @@ function converToReservationList(xml response) returns DescribeInstanceList {
     reservationList.instanceSet = list;
     return reservationList;
 }
+
+function getInstanceList(xml response) returns EC2Instance[] {
+    EC2Instance[] list = [];
+    int i = 0;
+    xml reservationSet = response["reservationSet"]["item"];
+
+    foreach reservation in reservationSet {
+        xml instances = reservation.elements();
+
+        foreach inst in instances["instancesSet"]["item"] {
+            xml content = inst.elements();
+            EC2Instance instance = {};
+            instance.id = content["instanceId"].getTextValue();
+            instance.imageId = content["imageId"].getTextValue();
+            instance.iType = content["instanceType"].getTextValue();
+            instance.zone = content["placement"]["availabilityZone"].getTextValue();
+            instance.state = getInstanceState(check <int>content["instanceState"]["code"].getTextValue());
+            instance.privateIpAddress = content["privateIpAddress"].getTextValue();
+            instance.ipAddress = content["ipAddress"].getTextValue();
+            list[i] = instance;
+            i++;
+        }
+    }
+
+    return list;
+}
+
+function getInstanceState(int status) returns InstanceState {
+    if (status == 0) {
+        return ISTATE_PENDING;
+    } else if (status == 16) {
+        return ISTATE_RUNNING;
+    } else if (status == 32) {
+        return ISTATE_SHUTTING_DOWN;
+    } else if (status == 48) {
+        return ISTATE_TERMINATED;
+    } else if (status == 64) {
+        return ISTATE_STOPPING;
+    } else if (status == 80) {
+        return ISTATE_STOPPED;
+    } else {
+        error e = {message: "Invalid EC2 instance state: " + status}; // This shouldn't happen
+        throw e;
+    }
+}
