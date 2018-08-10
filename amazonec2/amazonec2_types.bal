@@ -74,7 +74,7 @@ public type AmazonEC2Connector object {
         P{{maxCount}} - The maximum number of instances to launch
         P{{minCount}} - The minimum number of instances to launch
         R{{}} - If success, returns InstanceList of launched instances, else returns AmazonEC2Error object.}
-    public function runInstances(string imgId, int maxCount, int minCount) returns InstanceList|AmazonEC2Error;
+    public function runInstances(string imgId, int maxCount, int minCount) returns EC2Instance[]|AmazonEC2Error;
 
     documentation {
         Describes one or more of your instances.
@@ -85,7 +85,7 @@ public type AmazonEC2Connector object {
         Shuts down one or more instances.
         P{{instanceArray}} - One or more instance IDs
         R{{}} - If success, returns TerminationInstanceList with terminated instances, else returns AmazonEC2Error object.}
-    public function terminateInstances(string[] instanceArray) returns TerminationInstanceList|AmazonEC2Error;
+    public function terminateInstances(string[] instanceArray) returns EC2Instance[]|AmazonEC2Error;
 };
 
 documentation {
@@ -123,7 +123,6 @@ public type EC2Instance record {
     string zone,
     string privateIpAddress,
     string ipAddress,
-    !...
 };
 
 documentation {

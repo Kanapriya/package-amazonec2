@@ -148,21 +148,55 @@ function getInstanceList(xml response) returns EC2Instance[] {
         xml instances = reservation.elements();
 
         foreach inst in instances["instancesSet"]["item"] {
-            xml content = inst.elements();
-            EC2Instance instance = {};
-            instance.id = content["instanceId"].getTextValue();
-            instance.imageId = content["imageId"].getTextValue();
-            instance.iType = content["instanceType"].getTextValue();
-            instance.zone = content["placement"]["availabilityZone"].getTextValue();
-            instance.state = getInstanceState(check <int>content["instanceState"]["code"].getTextValue());
-            instance.privateIpAddress = content["privateIpAddress"].getTextValue();
-            instance.ipAddress = content["ipAddress"].getTextValue();
-            list[i] = instance;
+            list[i] = getInstance(inst.elements());
             i++;
         }
     }
 
     return list;
+}
+
+function getSpawnedInstancesList(xml response) returns EC2Instance[] {
+    EC2Instance[] list = [];
+    int i = 0;
+    xml spawnedInstances = response["instancesSet"]["item"];
+
+    foreach inst in spawnedInstances {
+        list[i] = getInstance(inst.elements());
+        i++;
+    }
+
+    return list;
+}
+
+function getTerminatedInstancesList(xml response) returns EC2Instance[] {
+    EC2Instance[] list = [];
+    int i = 0;
+    xml terminatedInstances = response["instancesSet"]["item"];
+
+    foreach inst in terminatedInstances {
+        xml content = inst.elements();
+        EC2Instance instance = {};
+        instance.id = content["instanceId"].getTextValue();
+        instance.state = getInstanceState(check <int>content["currentState"]["code"].getTextValue());
+        instance.previousState = getInstanceState(check <int>content["previousState"]["code"].getTextValue());
+        list[i] = instance;
+        i++;
+    }
+
+    return list;
+}
+
+function getInstance(xml content) returns EC2Instance {
+    EC2Instance instance = {};
+    instance.id = content["instanceId"].getTextValue();
+    instance.imageId = content["imageId"].getTextValue();
+    instance.iType = content["instanceType"].getTextValue();
+    instance.zone = content["placement"]["availabilityZone"].getTextValue();
+    instance.state = getInstanceState(check <int>content["instanceState"]["code"].getTextValue());
+    instance.privateIpAddress = content["privateIpAddress"].getTextValue();
+    instance.ipAddress = content["ipAddress"].getTextValue();
+    return instance;
 }
 
 function getInstanceState(int status) returns InstanceState {
