@@ -15,8 +15,6 @@ The Amazon ec2 connector allows you to access the Amazon ec2 REST API through ba
     ACCESS_KEY_ID=""
     SECRET_ACCESS_KEY=""
     REGION=""
-    INSTANCE_ID_1=""
-    INSTANCE_ID_2=""
     IMAGE_ID=""
     MAX_COUNT=2
     MIN_COUNT=1

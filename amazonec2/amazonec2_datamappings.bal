@@ -20,10 +20,24 @@ function converToInstanceList(xml response) returns InstanceList {
     xml instances = response["instancesSet"]["item"];
     InstanceSet[] list;
     int j = 0;
+    int k = 0;
     foreach i, x in instances {
+        StateSet stateSet = {};
+        StateSet [] setList;
         xml content = x.elements();
         InstanceSet instanceSet = {};
         instanceSet.instanceId = content["instanceId"].getTextValue();
+        instanceSet.imageId = content["imageId"].getTextValue();
+        instanceSet.instanceType = content["instanceType"].getTextValue();
+        instanceSet.reason = content["reason"].getTextValue();
+        xml instanceStates = content["instanceState"];
+        foreach a, y in instanceStates {
+            xml stateContent = y.elements();
+            stateSet.code = stateContent["code"].getTextValue();
+            stateSet.name = stateContent["name"].getTextValue();
+            setList[k] = stateSet;
+        }
+        instanceSet.instanceState = setList;
         list[j] = instanceSet;
         j = j + 1;
     }
@@ -31,19 +45,96 @@ function converToInstanceList(xml response) returns InstanceList {
     return instancesList;
 }
 
-function converToReservationList(xml response) returns ReservationList {
-    ReservationList reservationList = {};
-    reservationList.requestId = response["requestId"].getTextValue();
-    xml reservations = response["reservationSet"]["item"];
-    ReservationSet[] list;
+function converToTerminationInstanceList(xml response) returns TerminationInstanceList {
+    TerminationInstanceList instancesList = {};
+    instancesList.requestId = response["requestId"].getTextValue();
+    xml instances = response["instancesSet"]["item"];
+    TerminateInstanceSet[] list;
     int j = 0;
-    foreach i, x in reservations {
+    int k = 0;
+    int m = 0;
+    foreach i, x in instances {
+        StateSet stateSet = {};
+        StateSet [] setList;
         xml content = x.elements();
-        ReservationSet reservationSet = {};
-        reservationSet.reservationId = content["reservationId"].getTextValue();
-        list[j] = reservationSet;
+        TerminateInstanceSet instanceSet = {};
+        instanceSet.instId = content["instanceId"].getTextValue();
+        xml currentStates = content["currentState"];
+        foreach a, y in currentStates {
+            xml stateContent = y.elements();
+            stateSet.code = stateContent["code"].getTextValue();
+            stateSet.name = stateContent["name"].getTextValue();
+            setList[k] = stateSet;
+        }
+        instanceSet.currentState = setList;
+        xml previousStates = content["previousState"];
+        foreach b, z in previousStates {
+            xml previousStateContent = z.elements();
+            stateSet.code = previousStateContent["code"].getTextValue();
+            stateSet.name = previousStateContent["name"].getTextValue();
+            setList[m] = stateSet;
+        }
+        instanceSet.previousState = setList;
+        list[j] = instanceSet;
         j = j + 1;
     }
-    reservationList.reservationSet = list;
+    instancesList.instanceSet = list;
+    return instancesList;
+}
+
+function converToReservationList(xml response) returns DescribeInstanceList {
+    DescribeInstanceList reservationList = {};
+    InstanceList instanceList = {};
+    reservationList.requestId = response["requestId"].getTextValue();
+    xml reservations = response["reservationSet"]["item"]["instancesSet"]["item"];
+    DescribeInstanceSet [] list;
+    StateSet [] setList;
+    MonitoringList[] monitoringList;
+    PlacementList[] placementList;
+    int j = 0;
+    int k = 0;
+    int l = 0;
+    int n = 0;
+    foreach i, x in reservations {
+        xml content = x.elements();
+        StateSet stateSet = {};
+        MonitoringList monitoringElement = {};
+        PlacementList placementElement = {};
+        DescribeInstanceSet instanceSet = {};
+        instanceSet.instanceId = content["instanceId"].getTextValue();
+        instanceSet.imageId = content["imageId"].getTextValue();
+        instanceSet.instanceType = content["instanceType"].getTextValue();
+        instanceSet.reason = content["reason"].getTextValue();
+        instanceSet.launchTime = content["launchTime"].getTextValue();
+        instanceSet.privateIpAddress = content["privateIpAddress"].getTextValue();
+        instanceSet.ipAddress = content["ipAddress"].getTextValue();
+        xml instanceStates = content["instanceState"];
+        foreach a, y in instanceStates {
+            xml stateContent = y.elements();
+            stateSet.code = stateContent["code"].getTextValue();
+            stateSet.name = stateContent["name"].getTextValue();
+            setList[k] = stateSet;
+        }
+        instanceSet.instanceState = setList;
+        xml monitoring = content["monitoring"];
+        foreach b, w in monitoring {
+            xml monitoringElements = w.elements();
+            monitoringElement.state = monitoringElements["state"].getTextValue();
+            monitoringList[l] = monitoringElement;
+        }
+        instanceSet.monitoring = monitoringList;
+        xml placement = content["placement"];
+        foreach c, d in placement {
+            xml placementElements = d.elements();
+            placementElement.availabilityZone = placementElements["availabilityZone"].getTextValue();
+            placementElement.groupName = placementElements["groupName"].getTextValue();
+            placementElement.tenancy = placementElements["tenancy"].getTextValue();
+            placementList[n] = placementElement;
+        }
+        instanceSet.placement = placementList;
+        list[j] = instanceSet;
+        j = j + 1;
+    }
+    reservationList.instanceSet = list;
     return reservationList;
 }

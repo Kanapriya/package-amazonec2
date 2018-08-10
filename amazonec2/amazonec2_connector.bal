@@ -63,7 +63,7 @@ function AmazonEC2Connector::runInstances(string imgId, int maxCount, int minCou
     }
 }
 
-function AmazonEC2Connector::describeInstances() returns ReservationList|AmazonEC2Error {
+function AmazonEC2Connector::describeInstances() returns DescribeInstanceList |AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -106,7 +106,7 @@ function AmazonEC2Connector::describeInstances() returns ReservationList|AmazonE
     }
 }
 
-function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error {
+function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns TerminationInstanceList|AmazonEC2Error {
 
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -141,7 +141,7 @@ function AmazonEC2Connector::terminateInstances(string[] instanceArray) returns 
                 }
                 xml xmlResponse => {
                     if (statusCode == 200) {
-                        return converToInstanceList(xmlResponse);
+                        return converToTerminationInstanceList(xmlResponse);
                     } else {
                         amazonEC2Error.message = xmlResponse["Message"].getTextValue();
                         amazonEC2Error.statusCode = statusCode;

@@ -17,6 +17,7 @@
 //
 
 import ballerina/io;
+import ballerina/time;
 
 documentation {
     Define the AmazonEC2 Connector.
@@ -68,14 +69,14 @@ public type AmazonEC2Connector object {
 
     documentation {
         Describes one or more of your instances.
-        R{{}} - If success, returns ReservationList with zero or more reservations., else returns AmazonEC2Error object.}
-    public function describeInstances() returns ReservationList|AmazonEC2Error;
+        R{{}} - If success, returns DescribeInstanceList with zero or more reservations., else returns AmazonEC2Error object.}
+    public function describeInstances() returns DescribeInstanceList |AmazonEC2Error;
 
     documentation {
         Shuts down one or more instances.
         P{{instanceArray}} - One or more instance IDs
-        R{{}} - If success, returns InstanceList with terminated instances, else returns AmazonEC2Error object.}
-    public function terminateInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error;
+        R{{}} - If success, returns TerminationInstanceList with terminated instances, else returns AmazonEC2Error object.}
+    public function terminateInstances(string[] instanceArray) returns TerminationInstanceList|AmazonEC2Error;
 };
 
 documentation {
@@ -105,29 +106,107 @@ public type InstanceList record {
 };
 
 documentation {
-    Define the Instance set with instane id's
-    F{{instanceId}} - Instance set of with instance id
-}
-public type InstanceSet record {
-    string instanceId;
-};
-
-documentation {
-    Define the Reservation object details
-    F{{reservationSet}} - Reservation set with instance details.
+    Define the termination instance object details
+    F{{instanceSet}} - Instance set with terminated instance ids
     F{{requestId}} - request id
 }
-public type ReservationList record {
-    ReservationSet[] reservationSet;
+public type TerminationInstanceList record {
+    TerminateInstanceSet[] instanceSet;
     string requestId;
 };
 
 documentation {
-    Define the Reservation set with reservation id's
-    F{{reservationId}} - Reservation id
+    Define the Instance set with instane id's for termination
+    F{{instanceId}} - Instance set of with instance id
+    F{{currentState}} - Current state of instances for the termination request
+    F{{previousState}} - previuos state of the instances for the termination
 }
-public type ReservationSet record {
-    string reservationId;
+public type TerminateInstanceSet record {
+    string instanceId;
+    StateSet[] currentState;
+    StateSet[] previousState;
+};
+
+documentation {
+    Define the Instance set with instane id's for launch the isntance
+    F{{instanceId}} - Instance id
+    F{{instanceState}} - State of the launched instance
+    F{{instanceType}} - Type of the instance
+    F{{reason}} - The reason
+    F{{imageId}} - The imageId of the launched instance
+}
+public type InstanceSet record {
+    string instanceId;
+    StateSet[] instanceState;
+    string instanceType;
+    string reason;
+    string imageId;
+};
+
+documentation {
+    Define the DescribeInstance object details
+    F{{instanceSet}} - Reservation set with instance details.
+    F{{requestId}} - request id
+}
+public type DescribeInstanceList record {
+    DescribeInstanceSet[] instanceSet;
+    string requestId;
+};
+
+documentation {
+    Define the describe instance  set with instance id's
+    F{{instanceId}} - Instance id
+    F{{imageId}} - Image id
+    F{{instanceType}} - Instance type
+    F{{reason}} - Reason for launch an instance
+    F{{launchTime}} - Launch time
+    F{{privateIpAddress}} - Private IP address of launched instance
+    F{{ipAddress}} - Ip address
+    F{{instanceState}} - State of the instances
+    F{{monitoring}} - Monitoring details of instances
+    F{{placement}} - Placement details of instances
+}
+public type DescribeInstanceSet record {
+    string instanceId;
+    string imageId;
+    string instanceType;
+    string reason;
+    string launchTime;
+    string privateIpAddress;
+    string ipAddress;
+    StateSet[] instanceState;
+    MonitoringList[] monitoring;
+    PlacementList[] placement;
+};
+
+documentation {
+    Define the state set with code and name
+    F{{code}} - Code
+    F{{name}} - Name
+}
+public type StateSet record {
+    string code;
+    string name;
+};
+
+documentation {
+    Define the monitoring information of an instance
+    F{{state}} - state
+}
+public type MonitoringList record {
+    string state;
+};
+
+documentation {
+    Define the placement details of an instance
+    F{{availabilityZone}} - The availabilityZone of the instance
+    F{{groupName}} - Group name of the instance
+    F{{tenancy}} - Tenancy of the instance
+}
+public type PlacementList record {
+    string availabilityZone;
+    string groupName;
+    string tenancy;
 };
 
 documentation {

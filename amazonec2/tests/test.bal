@@ -24,11 +24,10 @@ import ballerina/test;
 string testAccessKeyId = config:getAsString("ACCESS_KEY_ID");
 string testSecretAccessKey = config:getAsString("SECRET_ACCESS_KEY");
 string testRegion = config:getAsString("REGION");
-string testInstance_1 = config:getAsString("INSTANCE_ID_1");
-string testInstance_2 = config:getAsString("INSTANCE_ID_1");
-string imageId = config:getAsString("IMAGE_ID");
+string testImageId = config:getAsString("IMAGE_ID");
 int max = config:getAsInt("MAX_COUNT");
 int min = config:getAsInt("MIN_COUNT");
+string testInstanceId;
 
 endpoint Client amazonEC2Client {
     accessKeyId: testAccessKeyId,
@@ -39,12 +38,12 @@ endpoint Client amazonEC2Client {
 @test:Config
 function testRunInstances() {
     log:printInfo("amazonEC2Client -> runInstances()");
-    var rs = amazonEC2Client->runInstances(imageId, max, min);
+    var rs = amazonEC2Client->runInstances(testImageId, max, min);
     match rs {
         InstanceList instance => {
             io:println(" Successfully run the instance : ");
-            string instanceId = (instance.instanceSet[0].instanceId);
-            test:assertNotEquals(instanceId, null, msg = "Failed to runInstances");
+            testInstanceId = (instance.instanceSet[0].instanceId);
+            test:assertNotEquals(testInstanceId, null, msg = "Failed to runInstances");
         }
         AmazonEC2Error err => {
             io:println(err);
@@ -58,11 +57,10 @@ function testDescribeInstances() {
     log:printInfo("amazonEC2Client -> describeInstances()");
     var rs = amazonEC2Client->describeInstances();
     match rs {
-        ReservationList reservations => {
+        DescribeInstanceList instancesList => {
             io:println(" Successfully describe the instance : ");
-            string reservationId = reservations.reservationSet[0].reservationId;
-            io:println(reservationId);
-            test:assertNotEquals(reservationId, null, msg = "Failed to describeInstances");
+            string instanceId = instancesList.instanceSet[0].instanceId;
+            test:assertNotEquals(instanceId, null, msg = "Failed to describeInstances");
         }
         AmazonEC2Error err => {
             io:println(err);
@@ -71,13 +69,15 @@ function testDescribeInstances() {
     }
 }
 
-@test:Config
+@test:Config{
+    dependsOn:["testRunInstances"]
+}
 function testTerminateInstances() {
     log:printInfo("amazonEC2Client -> terminateInstances()");
-    string[] instanceArray = [testInstance_2,testInstance_2];
+    string[] instanceArray = [testInstanceId];
     var rs = amazonEC2Client->terminateInstances(instanceArray);
     match rs {
-        InstanceList instance => {
+        TerminationInstanceList instance => {
             io:println(" Successfully terminate the instance : ");
             string instanceId = (instance.instanceSet[0].instanceId);
             test:assertNotEquals(instanceId, null, msg = "Failed to terminateInstances");

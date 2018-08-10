@@ -54,38 +54,36 @@ The `match` operation can be used to handle the response if an error occurs.
 match runInstancesResponse {
         amazonec2:InstanceList instance => {
             io:println(" Successfully launch the instance : ");
-            string instanceId = (instance.instanceSet[0].instanceId);
-            io:println("Instance Id : " + instanceId);
+            testInstanceId = (instance.instanceSet[0].instanceId);
+            io:println(instance);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
 ```
 
-The `describeInstances` function describes one or more of your instances.. It returns a `ReservationList` object 
+The `describeInstances` function describes one or more of your instances.. It returns a `DescribeInstanceList` object 
 with reservation ids if it is successful or the response is a `AmazonEC2Error`. 
 
 ```ballerina
 match describeInstancesResponse {
-        amazonec2:ReservationList reservations => {
+        amazonec2:DescribeInstanceList instanceList => {
             io:println(" Successfully describe the instances : ");
-            string reservationId = (reservations.reservationSet[0].reservationId);
-            io:println("Reservation Id : " + reservationId);
+            io:println(instanceList);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
 ```
-The `terminateInstances` function shuts down one or more instances. It returns a `InstanceList` object 
+The `terminateInstances` function shuts down one or more instances. It returns a `TerminationInstanceList` object 
 with terminated instance ids if it is successful or the response is a `AmazonEC2Error`. 
 
 ```ballerina
 match terminateInstancesResponse {
-        amazonec2:InstanceList instance => {
+        amazonec2:TerminationInstanceList instance => {
             io:println(" Successfully terminate the instances : ");
-            string instanceId = (instance.instanceSet[0].instanceId);
-            io:println("Terminated Instance Id : " + instanceId);
+            io:println(instance);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
-}
+    }
 ```
 
 ## Example
@@ -98,39 +96,38 @@ function main(string... args) {
         accessKeyId: "",
         secretAccessKey: "",
         region: "",
-   	clientConfig:{}
+   	    clientConfig:{}
     };
 
-    string[] instanceArray = ["i-05ec3efvfff7f41474a60d", "i-0gddff97b6190273d0aecd"];
+    string testInstanceId;
     string imgId = "ami-0ad9l9772";
     int maxCount = 2;
     int minCount = 1;
+    string[] instanceArray = [testInstanceId];
     var runInstancesResponse = amazonEC2Client->runInstances(imgId, maxCount, minCount);
     match runInstancesResponse {
         amazonec2:InstanceList instance => {
             io:println(" Successfully launch the instance : ");
-            string instanceId = (instance.instanceSet[0].instanceId);
-            io:println("Instance Id : " + instanceId);
+            testInstanceId = (instance.instanceSet[0].instanceId);
+            io:println(instance);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
 
     var describeInstancesResponse = amazonEC2Client->describeInstances();
     match describeInstancesResponse {
-        amazonec2:ReservationList reservations => {
+        amazonec2:DescribeInstanceList instanceList => {
             io:println(" Successfully describe the instances : ");
-            string reservationId = (reservations.reservationSet[0].reservationId);
-            io:println("Reservation Id : " + reservationId);
+            io:println(instanceList);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
 
     var terminateInstancesResponse = amazonEC2Client->terminateInstances(instanceArray);
     match terminateInstancesResponse {
-        amazonec2:InstanceList instance => {
+        amazonec2:TerminationInstanceList instance => {
             io:println(" Successfully terminate the instances : ");
-            string instanceIds = (instance.instanceSet[0].instanceId);
-            io:println("Terminated Instance Id : " + instanceIds);
+            io:println(instance);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
