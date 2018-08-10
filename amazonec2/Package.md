@@ -103,7 +103,7 @@ function main(string... args) {
     string imgId = "ami-0ad9l9772";
     int maxCount = 2;
     int minCount = 1;
-    string[] instanceArray = [testInstanceId];
+    string[] instanceArray = ["i-0123456","i-256987"];
     var runInstancesResponse = amazonEC2Client->runInstances(imgId, maxCount, minCount);
     match runInstancesResponse {
         amazonec2:InstanceList instance => {
