@@ -17,13 +17,13 @@
 function converToInstanceList(xml response) returns InstanceList {
     InstanceList instancesList = {};
     instancesList.requestId = response["requestId"].getTextValue();
-    xml instances = response["instancesSet"];
+    xml instances = response["instancesSet"]["item"];
     InstanceSet[] list;
     int j = 0;
     foreach i, x in instances {
         xml content = x.elements();
         InstanceSet instanceSet = {};
-        instanceSet.instanceId = content["item"]["instanceId"].getTextValue();
+        instanceSet.instanceId = content["instanceId"].getTextValue();
         list[j] = instanceSet;
         j = j + 1;
     }
@@ -34,13 +34,13 @@ function converToInstanceList(xml response) returns InstanceList {
 function converToReservationList(xml response) returns ReservationList {
     ReservationList reservationList = {};
     reservationList.requestId = response["requestId"].getTextValue();
-    xml reservations = response["reservationSet"];
+    xml reservations = response["reservationSet"]["item"];
     ReservationSet[] list;
     int j = 0;
     foreach i, x in reservations {
         xml content = x.elements();
         ReservationSet reservationSet = {};
-        reservationSet.instanceId = content["item"]["reservationId"].getTextValue();
+        reservationSet.reservationId = content["reservationId"].getTextValue();
         list[j] = reservationSet;
         j = j + 1;
     }

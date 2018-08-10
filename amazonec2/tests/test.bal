@@ -60,7 +60,8 @@ function testDescribeInstances() {
     match rs {
         ReservationList reservations => {
             io:println(" Successfully describe the instance : ");
-            string reservationId = (reservations.reservationSet[0].reservationId);
+            string reservationId = reservations.reservationSet[0].reservationId;
+            io:println(reservationId);
             test:assertNotEquals(reservationId, null, msg = "Failed to describeInstances");
         }
         AmazonEC2Error err => {

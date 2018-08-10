@@ -67,12 +67,12 @@ public type AmazonEC2Connector object {
     public function runInstances(string imgId, int maxCount, int minCount) returns InstanceList|AmazonEC2Error;
 
     documentation {
-        Enables detailed monitoring for a running instance.
+        Describes one or more of your instances.
         R{{}} - If success, returns ReservationList with zero or more reservations., else returns AmazonEC2Error object.}
     public function describeInstances() returns ReservationList|AmazonEC2Error;
 
     documentation {
-        Terminate an Amazon EBS-backed instance.
+        Shuts down one or more instances.
         P{{instanceArray}} - One or more instance IDs
         R{{}} - If success, returns InstanceList with terminated instances, else returns AmazonEC2Error object.}
     public function terminateInstances(string[] instanceArray) returns InstanceList|AmazonEC2Error;

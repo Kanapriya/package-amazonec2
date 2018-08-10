@@ -56,13 +56,12 @@ function main(string... args) {
     };
 
     string[] instanceArray = ["i-cddfe0", "i-12356"];
-    var startInstancesResponse = amazonEC2Client->startInstances(instanceArray);
-    io:println(startInstancesResponse);
-    match startInstancesResponse {
+    var terminateInstancesResponse = amazonEC2Client->terminateInstances(instanceArray);
+    match terminateInstancesResponse {
         amazonec2:InstanceList instance => {
-            io:println(" Successfully start the instance : ");
+            io:println(" Successfully terminate the instance : ");
             string instanceId = (instance.instanceSet[0].instanceId);
-            io:println("Started Instance Id : " + instanceId);
+            io:println("Instance Id : " + instanceId);
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
