@@ -14,131 +14,6 @@
 // specific language governing permissions and limitations
 // under the License
 
-function converToInstanceList(xml response) returns InstanceList {
-    InstanceList instancesList = {};
-    instancesList.requestId = response["requestId"].getTextValue();
-    xml instances = response["instancesSet"]["item"];
-    InstanceSet[] list;
-    int j = 0;
-    int k = 0;
-    foreach i, x in instances {
-        StateSet stateSet = {};
-        StateSet [] setList;
-        xml content = x.elements();
-        InstanceSet instanceSet = {};
-        instanceSet.instanceId = content["instanceId"].getTextValue();
-        instanceSet.imageId = content["imageId"].getTextValue();
-        instanceSet.instanceType = content["instanceType"].getTextValue();
-        instanceSet.reason = content["reason"].getTextValue();
-        xml instanceStates = content["instanceState"];
-        foreach a, y in instanceStates {
-            xml stateContent = y.elements();
-            stateSet.code = stateContent["code"].getTextValue();
-            stateSet.name = stateContent["name"].getTextValue();
-            setList[k] = stateSet;
-        }
-        instanceSet.instanceState = setList;
-        list[j] = instanceSet;
-        j = j + 1;
-    }
-    instancesList.instanceSet = list;
-    return instancesList;
-}
-
-function converToTerminationInstanceList(xml response) returns TerminationInstanceList {
-    TerminationInstanceList instancesList = {};
-    instancesList.requestId = response["requestId"].getTextValue();
-    xml instances = response["instancesSet"]["item"];
-    TerminateInstanceSet[] list;
-    int j = 0;
-    int k = 0;
-    int m = 0;
-    foreach i, x in instances {
-        StateSet stateSet = {};
-        StateSet [] setList;
-        xml content = x.elements();
-        TerminateInstanceSet instanceSet = {};
-        instanceSet.instanceId = content["instanceId"].getTextValue();
-        xml currentStates = content["currentState"];
-        foreach a, y in currentStates {
-            xml stateContent = y.elements();
-            stateSet.code = stateContent["code"].getTextValue();
-            stateSet.name = stateContent["name"].getTextValue();
-            setList[k] = stateSet;
-        }
-        instanceSet.currentState = setList;
-        xml previousStates = content["previousState"];
-        foreach b, z in previousStates {
-            xml previousStateContent = z.elements();
-            stateSet.code = previousStateContent["code"].getTextValue();
-            stateSet.name = previousStateContent["name"].getTextValue();
-            setList[m] = stateSet;
-        }
-        instanceSet.previousState = setList;
-        list[j] = instanceSet;
-        j = j + 1;
-    }
-    instancesList.instanceSet = list;
-    return instancesList;
-}
-
-function converToReservationList(xml response) returns DescribeInstanceList {
-    DescribeInstanceList reservationList = {};
-    InstanceList instanceList = {};
-    reservationList.requestId = response["requestId"].getTextValue();
-    xml reservations = response["reservationSet"]["item"]["instancesSet"]["item"];
-    DescribeInstanceSet [] list;
-    StateSet [] setList;
-    MonitoringList[] monitoringList;
-    PlacementList[] placementList;
-    int j = 0;
-    int k = 0;
-    int l = 0;
-    int n = 0;
-    foreach i, x in reservations {
-        xml content = x.elements();
-        StateSet stateSet = {};
-        MonitoringList monitoringElement = {};
-        PlacementList placementElement = {};
-        DescribeInstanceSet instanceSet = {};
-        instanceSet.instanceId = content["instanceId"].getTextValue();
-        instanceSet.imageId = content["imageId"].getTextValue();
-        instanceSet.instanceType = content["instanceType"].getTextValue();
-        instanceSet.reason = content["reason"].getTextValue();
-        instanceSet.launchTime = content["launchTime"].getTextValue();
-        instanceSet.privateIpAddress = content["privateIpAddress"].getTextValue();
-        instanceSet.ipAddress = content["ipAddress"].getTextValue();
-        xml instanceStates = content["instanceState"];
-        foreach a, y in instanceStates {
-            xml stateContent = y.elements();
-            stateSet.code = stateContent["code"].getTextValue();
-            stateSet.name = stateContent["name"].getTextValue();
-            setList[k] = stateSet;
-        }
-        instanceSet.instanceState = setList;
-        xml monitoring = content["monitoring"];
-        foreach b, w in monitoring {
-            xml monitoringElements = w.elements();
-            monitoringElement.state = monitoringElements["state"].getTextValue();
-            monitoringList[l] = monitoringElement;
-        }
-        instanceSet.monitoring = monitoringList;
-        xml placement = content["placement"];
-        foreach c, d in placement {
-            xml placementElements = d.elements();
-            placementElement.availabilityZone = placementElements["availabilityZone"].getTextValue();
-            placementElement.groupName = placementElements["groupName"].getTextValue();
-            placementElement.tenancy = placementElements["tenancy"].getTextValue();
-            placementList[n] = placementElement;
-        }
-        instanceSet.placement = placementList;
-        list[j] = instanceSet;
-        j = j + 1;
-    }
-    reservationList.instanceSet = list;
-    return reservationList;
-}
-
 function getInstanceList(xml response) returns EC2Instance[] {
     EC2Instance[] list = [];
     int i = 0;
@@ -199,6 +74,54 @@ function getInstance(xml content) returns EC2Instance {
     return instance;
 }
 
+function getImage(xml content) returns Image {
+    Image image = {};
+    image.imageId = content["imageId"].getTextValue();
+    image.imageLocation = content["imageLocation"].getTextValue();
+    image.imageState = content["imageState"].getTextValue();
+    image.creationDate = content["creationDate"].getTextValue();
+    image.description = content["description"].getTextValue();
+    image.imageType = content["imageType"].getTextValue();
+    image.name = content["name"].getTextValue();
+    return image;
+}
+
+function getImageList(xml response) returns  Image {
+    Image image = {};
+    image.imageId = response["imageId"].getTextValue();
+    return image;
+}
+
+function getSpawnedImageList(xml response) returns  Image[] {
+    Image[] image = [];
+    int i = 0;
+    xml imageList = response["imagesSet"]["item"];
+    foreach inst in imageList {
+        image[i] = getImage(inst.elements());
+        i++;
+    }
+    return image;
+}
+
+function getVolumeList(xml content) returns Volume {
+    Volume volume = {};
+    volume.availabilityZone = content["availabilityZone"].getTextValue();
+    volume.size = check <int> content["size"].getTextValue();
+    volume.volumeId = content["volumeId"].getTextValue();
+    volume.volumeType =  getAttachmentVolumeType(content["volumeType"].getTextValue());
+    return volume;
+}
+
+function getVolumeAttachmentList(xml content) returns AttachmentInfo {
+    AttachmentInfo attachment = {};
+    attachment.device = content["device"].getTextValue();
+    attachment.volumeId = content["volumeId"].getTextValue();
+    attachment.attachTime = content["attachTime"].getTextValue();
+    attachment.instanceId = content["instanceId"].getTextValue();
+    attachment.status = getAttachmentStatus(content["status"].getTextValue());
+    return attachment;
+}
+
 function getInstanceState(int status) returns InstanceState {
     if (status == 0) {
         return ISTATE_PENDING;
@@ -216,4 +139,132 @@ function getInstanceState(int status) returns InstanceState {
         error e = {message: "Invalid EC2 instance state: " + status}; // This shouldn't happen
         throw e;
     }
+}
+
+function getAttachmentVolumeType(string volumeType) returns VolumeType {
+    if (volumeType == "standard") {
+        return TYPE_STANDARD;
+    } else if (volumeType == "io1") {
+        return TYPE_IO1;
+    } else if (volumeType == "gp2") {
+        return TYPE_GP2;
+    } else if (volumeType == "sc1") {
+        return TYPE_SC1;
+    } else if (volumeType == "st1") {
+        return TYPE_ST1;
+    } else {
+        error e = {message: "Invalid EC2 volume type: " + volumeType};
+        throw e;
+    }
+}
+
+function getAttachmentStatus(string status) returns VolumeAttachmentStatus {
+    if (status == "attaching") {
+        return ATTACHING;
+    } else if (status == "attached") {
+        return ATTACHED;
+    } else if (status == "detaching") {
+        return DETACHING;
+    } else if (status == "detached") {
+        return DETACHED;
+    } else if (status == "busy") {
+        return BUSY;
+    } else {
+        error e = {message: "Invalid EC2 volume attachment status: " + status};
+        throw e;
+    }
+}
+
+function getAttributeValue(string attribute, xml content) returns ImageAttribute {
+    if (attribute == "description") {
+        return getImageWithDescriptionAttribute(content);
+    } else if (attribute == "kernel") {
+        return getImageWithKernelAttribute(content);
+    } else if (attribute == "launchPermission") {
+        return getImageWithLaunchPermissionAttribute(content);
+    } else if (attribute == "productCodes") {
+        return getImageWithProductCodesAttribute(content);
+    } else if (attribute == "blockDeviceMapping") {
+        return getImageWithBlockDeviceMappingAttribute(content);
+    } else if (attribute == "sriovNetSupport") {
+        return getImageWithSriovNetSupportAttribute(content);
+    } else if (attribute == "ramdisk") {
+        return getImageWithRamDiskAttribute(content);
+    } else {
+        error e = {message: "Invalid EC2 Image attribute: " + attribute};
+        throw e;
+    }
+}
+
+function getImageWithDescriptionAttribute(xml content) returns DescriptionAttribute {
+    DescriptionAttribute descriptionAttribute = {};
+    descriptionAttribute.description = content["description"]["value"].getTextValue();
+    return descriptionAttribute;
+}
+
+function getImageWithKernelAttribute(xml content) returns KernelAttribute {
+    KernelAttribute kernelAttribute = {};
+    kernelAttribute.kernelId = content["kernel"]["value"].getTextValue();
+    return kernelAttribute;
+}
+
+function getImageWithLaunchPermissionAttribute(xml content) returns LaunchPermissionAttribute[] {
+    LaunchPermissionAttribute[] launchPermissionAttribute = [];
+    int i = 0;
+    xml permissionList = content["launchPermission"]["item"];
+    foreach inst in permissionList {
+        xml elements = inst.elements();
+        LaunchPermissionAttribute permission = {};
+        permission.groupName = elements["group"].getTextValue();
+        permission.userId = elements["userId"].getTextValue();
+        launchPermissionAttribute[i] = permission;
+        i++;
+    }
+    return launchPermissionAttribute;
+}
+
+
+function getImageWithProductCodesAttribute(xml content) returns ProductCodeAttribute[] {
+    ProductCodeAttribute[] productCodeAttribute = [];
+    int i = 0;
+    xml productCodeList = content["productCode"]["item"];
+    foreach inst in productCodeList {
+        xml elements = inst.elements();
+        ProductCodeAttribute code = {};
+        code.productCode = elements["productCode"].getTextValue();
+        code.productType = elements["type"].getTextValue();
+        productCodeAttribute[i] = code;
+        i++;
+    }
+    return productCodeAttribute;
+}
+
+
+function getImageWithBlockDeviceMappingAttribute(xml content) returns BlockDeviceMapping[] {
+    BlockDeviceMapping[] blockDeviceMapping = [];
+    int i = 0;
+    xml mappingList = content["blockDeviceMapping"]["item"];
+    foreach inst in mappingList {
+        xml elements = inst.elements();
+        BlockDeviceMapping mapping = {};
+        mapping.deviceName = elements["deviceName"].getTextValue();
+        mapping.noDevice = elements["noDevice"].getTextValue();
+        mapping.virtualName = elements["virtualName"].getTextValue();
+        blockDeviceMapping[i] = mapping;
+        i++;
+    }
+    return blockDeviceMapping;
+}
+
+
+function getImageWithSriovNetSupportAttribute(xml content) returns SriovNetSupportAttribute {
+    SriovNetSupportAttribute sriovNetSupportAttribute = {};
+    sriovNetSupportAttribute.sriovNetSupportValue = content["sriovNetSupport"]["value"].getTextValue();
+    return sriovNetSupportAttribute;
+}
+
+function getImageWithRamDiskAttribute(xml content) returns RamdiskAttribute {
+    RamdiskAttribute ramdiskAttribute = {};
+    ramdiskAttribute.ramDiskValue = content["ramdisk"]["value"].getTextValue();
+    return ramdiskAttribute;
 }

@@ -53,7 +53,10 @@ function generateSignature(http:Request request, string accessKeyId, string secr
     encodedrequestURIValue = encodedrequestURIValue.replace("%2F", "/");
     canonicalRequest = canonicalRequest + encodedrequestURIValue;
     canonicalRequest = canonicalRequest + "\n";
-    canonicalRequest = canonicalRequest + canonicalQueryString;
+    string encodedCanonicalQueryString = check http:encode(canonicalQueryString, UTF_8);
+    encodedCanonicalQueryString = encodedCanonicalQueryString.replace("%3D","=");
+    encodedCanonicalQueryString = encodedCanonicalQueryString.replace("%26","&");
+    canonicalRequest = canonicalRequest + encodedCanonicalQueryString;
     canonicalRequest = canonicalRequest + "\n";
 
     if (payload == "") {
