@@ -9,6 +9,21 @@ The Amazon ec2 connector allows you to run, describe, and terminate the ec2 inst
 The `kana/amazonec2` package contains operations that work with instances. You can launch, describe, and stop the 
 instances with these operations.
 
+**Security Group Operations**
+
+The `kana/amazonec2` package contains operations that work with security groups. You can create and delete the
+security groups with these operations.
+
+**Volume Operations**
+
+The `kana/amazonec2` package contains operations that work with Volume. You can create, attach and detach the
+volume with these operations.
+
+**Image Operations**
+
+The `kana/amazonec2` package contains operations that work with Amazon ec2 AMIs. You can create, describe, deRegister and copy the
+AMIs with these operations.
+
 ## Compatibility
 |                    |    Version     |  
 |:------------------:|:--------------:|
@@ -271,7 +286,7 @@ function main(string... args) {
 
 To test the following sample, create `ballerina.conf` file inside `sample location`, with following keys and provide values for the variables.
 
-    ```.conf
+```
     ACCESS_KEY_ID="<your_access_key_id>"
     SECRET_ACCESS_KEY="<your_secret_access_key_id>"
     REGION="<your_current_region>"
@@ -282,7 +297,7 @@ To test the following sample, create `ballerina.conf` file inside `sample locati
     ZONE_NAME="<The Availability Zone in which to create the volume>"
     DEVICE_NAME="<The device name to attach the volume (for example, /dev/sdh or xvdh)>"
     GROUP_NAME="<The name of the security group>"
-    ```
+```
 
 
 ## Example
@@ -305,12 +320,12 @@ function main(string... args) {
     string deviceName = config:getAsString("DEVICE_NAME");
 
     callAmazonEC2Methods(accessKeyId, secretAccessKey, region, imageId, groupName, zoneName,
-        deviceName, imageName, sourceImageId, sourceRegion );
+        deviceName, imageName, sourceImageId, sourceRegion);
 }
 
-function callAmazonEC2Methods(string accessKeyId, string secretAccessKey, string region, string imageId,
-                                 string groupName, string zoneName, string deviceName,
-                                 string imageName, string sourceImageId, string sourceRegion) {
+function callAmazonEC2Methods(string accessKeyId, string secretAccessKey, string region,
+                              string imageId, string groupName, string zoneName, string deviceName,
+                              string imageName, string sourceImageId, string sourceRegion) {
     endpoint amazonec2:Client amazonEC2Client {
         accessKeyId: accessKeyId,
         secretAccessKey: secretAccessKey,
