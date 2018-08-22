@@ -6,7 +6,7 @@ The Amazon ec2 connector allows you to run, describe, and terminate the ec2 inst
 
 **Instance Operations**
 
-The `kana/amazonec2` package contains operations that work with instances. You can launch, describe, and stop the 
+The `kana/amazonec2` package contains operations that work with instances. You can launch, describe, and terminate the
 instances with these operations.
 
 **Security Group Operations**
@@ -465,7 +465,9 @@ function callAmazonEC2Methods(string accessKeyId, string secretAccessKey, string
         amazonec2:AmazonEC2Error e => io:println(e);
     }
 
+
     runtime:sleep(100000); // wait for a bit before delete security group until the instance get terminates
+
     var deleteSecurityGroupResponse = amazonEC2Client->deleteSecurityGroup(groupId = testGroupId);
 
     match deleteSecurityGroupResponse {
