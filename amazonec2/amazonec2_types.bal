@@ -124,21 +124,21 @@ public type AmazonEC2Connector object {
     documentation {
         Describe images.
         R{{}} If successful, returns Image[] with image details, else returns an AmazonEC2Error.}
-    public function describeImages(string... imageIdArr) returns Image[]|AmazonEC2Error;
+    public function describeImages(string... imgIdArr) returns Image[]|AmazonEC2Error;
 
     documentation {
         Deregisters the specified AMI. After you deregister an AMI, it can't be used to launch new instances; however,
         it doesn't affect any instances that you've already launched from the AMI.
-        P{{imageId}} The ID of the AMI
+        P{{imgId}} The ID of the AMI
         R{{}} If successful, returns success response, else returns an AmazonEC2Error.}
-    public function deRegisterImage(string imageId) returns EC2ServiceResponse|AmazonEC2Error;
+    public function deRegisterImage(string imgId) returns EC2ServiceResponse|AmazonEC2Error;
 
     documentation {
         Describes the specified attribute of the specified AMI. You can specify only one attribute at a time.
-        P{{imageId}} The ID of the AMI
+        P{{amiId}} The ID of the AMI
         P{{attribute}} The specific attribute of the image.
         R{{}} If successful, returns success response, else returns an AmazonEC2Error.}
-    public function describeImageAttribute(string imageId, string attribute) returns ImageAttribute |AmazonEC2Error;
+    public function describeImageAttribute(string amiId, string attribute) returns ImageAttribute |AmazonEC2Error;
 
     documentation {
         Initiates the copy of an AMI from the specified source region to the current region.

@@ -233,7 +233,7 @@ function AmazonEC2Connector::createImage(string instanceId, string name) returns
     }
 }
 
-function AmazonEC2Connector::describeImages(string... imageIdArr) returns Image[]|AmazonEC2Error {
+function AmazonEC2Connector::describeImages(string... imgIdArr) returns Image[]|AmazonEC2Error {
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
     string httpMethod = "GET";
@@ -242,9 +242,9 @@ function AmazonEC2Connector::describeImages(string... imageIdArr) returns Image[
     string amazonEndpoint = "https://" + host;
     http:Request request = new;
     string canonicalQueryString = "Action=DescribeImages" + "&";
-    if(imageIdArr != null){
+    if(imgIdArr != null){
         int i = 1;
-        foreach instances in imageIdArr {
+        foreach instances in imgIdArr {
             canonicalQueryString = canonicalQueryString + "ImageId." + i + "=" + instances + "&";
             i = i + 1;
         }
@@ -283,7 +283,7 @@ function AmazonEC2Connector::describeImages(string... imageIdArr) returns Image[
     }
 }
 
-function AmazonEC2Connector::deRegisterImage(string imageId) returns EC2ServiceResponse |AmazonEC2Error {
+function AmazonEC2Connector::deRegisterImage(string imgId) returns EC2ServiceResponse |AmazonEC2Error {
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
     string httpMethod = "GET";
@@ -291,7 +291,7 @@ function AmazonEC2Connector::deRegisterImage(string imageId) returns EC2ServiceR
     string host = SERVICE_NAME + "." + self.region + "." + "amazonaws.com";
     string amazonEndpoint = "https://" + host;
     http:Request request = new;
-    string canonicalQueryString = "Action=DeregisterImage" + "&" + "ImageId" + "=" + imageId + "&" +
+    string canonicalQueryString = "Action=DeregisterImage" + "&" + "ImageId" + "=" + imgId + "&" +
         "Version" + "=" + API_VERSION;
     string constructCanonicalString = "/?" + canonicalQueryString;
     request.setHeader(HOST, host);
@@ -328,7 +328,7 @@ function AmazonEC2Connector::deRegisterImage(string imageId) returns EC2ServiceR
     }
 }
 
-function AmazonEC2Connector::describeImageAttribute(string imageId, string attribute)
+function AmazonEC2Connector::describeImageAttribute(string amiId, string attribute)
                                  returns ImageAttribute|AmazonEC2Error {
     endpoint http:Client clientEndpoint = self.clientEndpoint;
     AmazonEC2Error amazonEC2Error = {};
@@ -338,7 +338,7 @@ function AmazonEC2Connector::describeImageAttribute(string imageId, string attri
     string amazonEndpoint = "https://" + host;
     http:Request request = new;
     string canonicalQueryString = "Action=DescribeImageAttribute" + "&" + "Attribute" + "=" + attribute + "&" +
-        "ImageId" + "=" + imageId + "&" + "Version" + "=" + API_VERSION;
+        "ImageId" + "=" + amiId + "&" + "Version" + "=" + API_VERSION;
     string constructCanonicalString = "/?" + canonicalQueryString;
     request.setHeader(HOST, host);
     generateSignature(request, self.accessKeyId, self.secretAccessKey, self.region, GET, requestURI, "",

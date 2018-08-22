@@ -259,7 +259,7 @@ function testDetachVolume() {
     var rs = amazonEC2Client->detachVolume(testVolumeId);
     match rs {
         AttachmentInfo attachment => {
-            io:println(" Successfully attaches volume : ");
+            io:println(" Successfully detach the volume : ");
             io:println(attachment);
             test:assertNotEquals(attachment.volumeId, null, msg = "Failed to detach the volume");
         }
