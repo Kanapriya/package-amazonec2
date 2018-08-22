@@ -55,7 +55,6 @@ The `match` operation can be used to handle the response if an error occurs.
         amazonec2:EC2Instance[] insts => {
             io:println("Successfully run the instance : ");
             io:println(insts);
-            arr = insts;
         }
         amazonec2:AmazonEC2Error e => io:println(e);
     }
@@ -152,7 +151,7 @@ match copyImage {
     }
 ```
 The `createVolume` creates an EBS volume that can be attached to an instance in the same Availability Zone.
- It returns an `Volume` object with created volume details if it is successful or the response is a `AmazonEC2Error`.
+ It returns `Volume` object with created volume details if it is successful or the response is a `AmazonEC2Error`.
 
 ```ballerina
 match newVolume {
@@ -197,7 +196,6 @@ It returns `SecurityGroup` object with group id if it is successful or the respo
          amazonec2:SecurityGroup securityGroup => {
              io:println(" Successfully create a new security group : ");
              io:println(securityGroup);
-             testGroupId = securityGroup.groupId;
          }
          amazonec2:AmazonEC2Error e => io:println(e);
      }
