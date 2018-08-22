@@ -56,12 +56,12 @@ function main(string... args) {
     };
 
    var describeInstancesResponse = amazonEC2Client->describeInstances();
-     match describeInstancesResponse {
-         amazonec2:DescribeInstanceList instanceList => {
+   match describeInstancesResponse {
+         amazonec2:EC2Instance[] insts => {
              io:println(" Successfully describe the instances : ");
-             io:println(instanceList);
+             io:println(insts);
          }
          amazonec2:AmazonEC2Error e => io:println(e);
-     }
+   }
 }
 ```

@@ -16,8 +16,8 @@ The Amazon ec2 connector allows you to access the Amazon ec2 REST API through ba
     SECRET_ACCESS_KEY=""
     REGION=""
     IMAGE_ID=""
-    MAX_COUNT=2
-    MIN_COUNT=1
+    SOURCE_IMAGE_ID="ami-2opknj014f"
+    SOURCE_REGION="us-east-2"
     ```
 2. Navigate to the folder package-amazonec2
 
